@@ -1,0 +1,26 @@
+body {margin: 0; background: #6af68f;}
+
+.bodyBlock {
+    display: flex;
+    width: 100%;
+    height: 100vh;
+    justify-content: center;
+    align-items: center;
+}
+.loginBlock {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 280px;
+    height: auto;
+    row-gap: 10px;
+    padding: 10px;
+    border-radius: 10px;
+    border: 2px solid #037c3e;
+    background: #3cb95f;
+}
+.loginBlock label {display: flex; justify-content: space-between; font-size: 20px}
+.loginBlock input {height: 20px; border-radius: 6px}
+.loginBlock button {height: 25px; border-radius: 6px; background: #037c3e}
+.loginBlock h3 {color: #58f3c4; font-size: 25px; display: flex; justify-content: center}
+

@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        .imgFound {
+            position: absolute;
+            display: flex;
+            justify-content: center;
+            height: 95vh;
+            width: 100%;
+        }
+        .imgFound img {
+            height: 100%;
+        }
+        .error {
+            position: absolute;
+            font-size: 25px;
+            margin: 15px;
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+<div class="imgFound">
+    <div class="error">{{error}}</div>
+    <img src="https://media.doyouconvert.com/285/2021/6/9/404_Error.1000x750.jpeg" alt="notFound">
+</div>
+</body>
+</html>
