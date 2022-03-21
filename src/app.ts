@@ -2,10 +2,13 @@ import 'reflect-metadata';
 import express, { Request, Response } from 'express';
 import { createConnection, getManager } from 'typeorm';
 import { User } from './entity/user';
+import { apiRouter } from './router/apiRouter';
 
 const app = express();
 app.use(express.json());
-app.use(express.urlencoded());
+app.use(express.urlencoded({ extended: true }));
+
+app.use(apiRouter);
 
 app.get('/users', async (req: Request, res: Response) => {
     const users = await getManager().getRepository(User).find({ relations: ['posts'] });
@@ -29,11 +32,6 @@ app.get('/users', async (req: Request, res: Response) => {
     // res.json(users);
 });
 
-app.post('/users', async (req, res) => {
-    const createdUser = await getManager().getRepository(User).save(req.body);
-    res.json(createdUser);
-});
-
 app.patch('/users/:id', async (req, res) => {
     const { password, email } = req.body;
     const createdUser = await getManager().getRepository(User)
@@ -51,8 +49,10 @@ app.delete('/users/:id', async (req, res) => {
     res.json(createdUser);
 });
 
-app.listen(5200, async () => {
-    console.log('Server has started!!!!');
+const { PORT } = process.env;
+
+app.listen(PORT, async () => {
+    console.log(`Server has started!!!! on Port:${PORT} `);
     try {
         const connection = await createConnection();
         if (connection) {
