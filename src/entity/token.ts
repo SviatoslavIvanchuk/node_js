@@ -1,15 +1,15 @@
 import {
-    Column, CreateDateColumn, Entity, JoinColumn, OneToOne,
+    Column, Entity, JoinColumn, OneToOne,
 } from 'typeorm';
 
-import { CommonFields, ICommonFields } from './commonFields';
 import { User } from './user';
 import { config } from '../config/config';
+import { CommonFields, ICommonFields } from './commonFields';
 
 export interface IToken extends ICommonFields{
     refreshToken: string;
+    accessToken: string;
     userId: number;
-    createdAt: string;
 }
 
 @Entity('Tokens', { database: config.MYSQL_DATABASE_NAME })
@@ -22,14 +22,16 @@ export class Token extends CommonFields implements IToken {
         refreshToken: string;
 
     @Column({
+        type: 'varchar',
+        width: 250,
+        nullable: false,
+    })
+        accessToken: string;
+
+    @Column({
         type: 'int',
     })
         userId: number;
-
-    @CreateDateColumn({
-        type: 'timestamp',
-    })
-        createdAt: string;
 
     @OneToOne(() => User)
     @JoinColumn({ name: 'userId' })

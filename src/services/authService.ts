@@ -18,7 +18,7 @@ class AuthService {
     private async _getTokenData(userData: IUser): Promise<ITokenData> {
         const { id, email } = userData;
         const tokensPair = await tokenService.generateTokenPair({ userId: id, userEmail: email });
-        await tokenService.saveToken(id, tokensPair.refreshToken);
+        await tokenService.saveToken(id, tokensPair.refreshToken, tokensPair.accessToken);
 
         return {
             ...tokensPair,
