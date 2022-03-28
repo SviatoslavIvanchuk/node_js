@@ -36,6 +36,38 @@ class AuthMiddleware {
             });
         }
     }
+
+    public async checkRefreshToken(req: IRequestExtended, res: Response, next: NextFunction) {
+        try {
+            const refreshToken = req.get('Authorization');
+            if (!refreshToken) {
+                throw new Error('No Token!!!');
+            }
+
+            const { userEmail } = await tokenService.verifyToken(refreshToken, 'refresh');
+
+            const tokenPairFromDB = await tokenRepository.findByParams({ refreshToken });
+
+            if (!tokenPairFromDB) {
+                throw new Error('Token not valid!!!');
+            }
+
+            const userFromToken = await userService.getUserByEmail(userEmail);
+
+            if (!userFromToken) {
+                throw new Error('Token not valid!!!');
+            }
+
+            req.user = userFromToken;
+
+            next();
+        } catch (e: any) {
+            res.json({
+                status: 400,
+                message: e.message,
+            });
+        }
+    }
 }
 
 export const authMiddleware = new AuthMiddleware();
