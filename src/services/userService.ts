@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt';
-import { IUser } from '../entity/user';
-import { userRepository } from '../repositories/user/userRepository';
+import { IUser } from '../entity';
+import { userRepository } from '../repositories';
 
 class UserService {
     public async createUser(user: IUser): Promise<IUser> {
@@ -16,11 +16,23 @@ class UserService {
         return userRepository.getUserByEmail(email);
     }
 
+    public async getUserPagination() {
+        return userRepository.getUserPagination({ email: 'lang151@gmail.com' });
+    }
+
+    public async updateUser(id: number, obj: Partial<IUser>): Promise<object | undefined> {
+        if (obj.password) {
+            obj.password = await this._hashPassword(obj.password);
+        }
+
+        return userRepository.updateUser(id, obj);
+    }
+
     public async compareUserPasswords(password: string, hash: string): Promise<void | Error> {
         const isPasswordsUnique = bcrypt.compare(password, hash);
 
         if (!isPasswordsUnique) {
-            throw new Error('User nor Exists!!!');
+            throw new Error('User not Exists!!!');
         }
     }
 

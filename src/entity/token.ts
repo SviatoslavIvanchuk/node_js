@@ -3,7 +3,7 @@ import {
 } from 'typeorm';
 
 import { User } from './user';
-import { config } from '../config/config';
+import { config } from '../config';
 import { CommonFields, ICommonFields } from './commonFields';
 
 export interface IToken extends ICommonFields{

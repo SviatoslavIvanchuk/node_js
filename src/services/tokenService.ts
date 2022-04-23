@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
-import { config } from '../config/config';
-import { IToken } from '../entity/token';
-import { tokenRepository } from '../repositories/token/tokenRepository';
+import { config } from '../config';
+import { IToken } from '../entity';
+import { tokenRepository } from '../repositories';
 import { ITokenPair, IUserPayload } from '../interfaces';
 
 class TokenService {
@@ -43,13 +43,24 @@ class TokenService {
         return tokenRepository.deleteByParams(searchObject);
     }
 
-    public async verifyToken(authToken: string, tokenType = 'access'): Promise<IUserPayload> {
+    public verifyToken(authToken: string, tokenType = 'access'): IUserPayload {
         let secretWord = config.SECRET_ACCESS_KEY;
         if (tokenType === 'refresh') {
             secretWord = config.SECRET_REFRESH_KEY;
         }
+        if (tokenType === 'action') {
+            secretWord = config.SECRET_ACTION_KEY;
+        }
 
         return jwt.verify(authToken, secretWord as string) as IUserPayload;
+    }
+
+    public generateActionToken(payload: IUserPayload): string {
+        return jwt.sign(
+            payload,
+            config.SECRET_ACTION_KEY as string,
+            { expiresIn: config.EXPIRES_IN_ACTION },
+        );
     }
 }
 

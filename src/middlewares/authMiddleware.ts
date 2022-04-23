@@ -2,14 +2,18 @@ import { NextFunction, Response } from 'express';
 
 import { tokenService, userService } from '../services';
 import { IRequestExtended } from '../interfaces';
-import { tokenRepository } from '../repositories/token/tokenRepository';
+import { actionTokenRepository, tokenRepository } from '../repositories';
+import { constants } from '../constants';
+import { ErrorHandler } from '../error';
+import { authValidator } from '../validators';
 
 class AuthMiddleware {
     public async checkAccessToken(req: IRequestExtended, res: Response, next: NextFunction) {
         try {
-            const accessToken = req.get('Authorization');
+            const accessToken = req.get(constants.AUTHORIZATION);
             if (!accessToken) {
-                throw new Error('No Token!!!');
+                next(new Error('No Token!!!'));
+                return;
             }
 
             const { userEmail } = await tokenService.verifyToken(accessToken);
@@ -17,31 +21,31 @@ class AuthMiddleware {
             const tokenPairFromDB = await tokenRepository.findByParams({ accessToken });
 
             if (!tokenPairFromDB) {
-                throw new Error('Token not valid!!!');
+                next(new ErrorHandler('Token not valid!!!', 401));
+                return;
             }
 
             const userFromToken = await userService.getUserByEmail(userEmail);
 
             if (!userFromToken) {
-                throw new Error('Token not valid!!!');
+                next(new ErrorHandler('Token not valid!!!', 401));
+                return;
             }
 
             req.user = userFromToken;
 
             next();
-        } catch (e: any) {
-            res.json({
-                status: 400,
-                message: e.message,
-            });
+        } catch (e) {
+            next(e);
         }
     }
 
     public async checkRefreshToken(req: IRequestExtended, res: Response, next: NextFunction) {
         try {
-            const refreshToken = req.get('Authorization');
+            const refreshToken = req.get(constants.AUTHORIZATION);
             if (!refreshToken) {
-                throw new Error('No Token!!!');
+                next(new ErrorHandler('No Token!!!', 401));
+                return;
             }
 
             const { userEmail } = await tokenService.verifyToken(refreshToken, 'refresh');
@@ -49,23 +53,88 @@ class AuthMiddleware {
             const tokenPairFromDB = await tokenRepository.findByParams({ refreshToken });
 
             if (!tokenPairFromDB) {
-                throw new Error('Token not valid!!!');
+                next(new ErrorHandler('Token not valid!!!', 401));
+                return;
             }
 
             const userFromToken = await userService.getUserByEmail(userEmail);
 
             if (!userFromToken) {
-                throw new Error('Token not valid!!!');
+                next(new ErrorHandler('Token not valid!!!', 401));
+                return;
             }
 
             req.user = userFromToken;
 
             next();
+        } catch (e) {
+            next(e);
+        }
+    }
+
+    public async checkActionToken(req: IRequestExtended, res: Response, next: NextFunction) {
+        try {
+            const actionToken = req.get(constants.AUTHORIZATION);
+
+            if (!actionToken) {
+                next(new ErrorHandler('No token'));
+                return;
+            }
+
+            const { userEmail } = tokenService.verifyToken(actionToken, 'action');
+
+            const tokenFromDB = await actionTokenRepository.findByParams({ actionToken });
+
+            if (!tokenFromDB) {
+                next(new ErrorHandler('Token not valid', 401));
+                return;
+            }
+
+            const userFromToken = await userService.getUserByEmail(userEmail);
+
+            if (!userFromToken) {
+                next(new ErrorHandler('Token not valid', 401));
+                return;
+            }
+
+            req.user = userFromToken;
+            next();
         } catch (e: any) {
-            res.json({
-                status: 400,
+            res.status(401).json({
+                status: 401,
                 message: e.message,
             });
+        }
+    }
+
+    public checkValidEmail(req: IRequestExtended, res: Response, next: NextFunction) {
+        try {
+            const { error, value } = authValidator.email.validate(req.body);
+
+            if (error) {
+                next(new ErrorHandler(error.details[0].message));
+            }
+
+            req.body = value;
+            next();
+        } catch (e) {
+            next(e);
+        }
+    }
+
+    public checkValidPassword(req: IRequestExtended, res: Response, next: NextFunction) {
+        try {
+            const { error, value } = authValidator.password.validate(req.body);
+
+            if (error) {
+                next(new ErrorHandler(error.details[0].message));
+                return;
+            }
+
+            req.body = value;
+            next();
+        } catch (e) {
+            next(e);
         }
     }
 }

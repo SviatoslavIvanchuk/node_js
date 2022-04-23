@@ -1,6 +1,8 @@
 import { Column, Entity, OneToMany } from 'typeorm';
+
 import { CommonFields } from './commonFields';
 import { Post } from './post';
+import { config } from '../config';
 
 export interface IUser {
     id: number;
@@ -13,7 +15,7 @@ export interface IUser {
     posts: any[];
 }
 
-@Entity('Users', { database: 'homework' })
+@Entity('Users', { database: config.MYSQL_DATABASE_NAME })
 export class User extends CommonFields implements IUser {
 @Column({
     type: 'varchar',

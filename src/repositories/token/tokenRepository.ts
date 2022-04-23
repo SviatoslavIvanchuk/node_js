@@ -1,6 +1,6 @@
 import { DeleteResult, getManager, Repository } from 'typeorm';
 
-import { IToken, Token } from '../../entity/token';
+import { IToken, Token } from '../../entity';
 import { ITokenRepository } from './tokenRepository.interface';
 import { ITokenDataToSave } from '../../interfaces';
 

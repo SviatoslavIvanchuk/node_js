@@ -1,8 +1,10 @@
 import { Router } from 'express';
-import { userController } from '../controller/userController';
+
+import { userController } from '../controller';
 
 const router = Router();
 
+router.get('/', userController.getUserPagination);
 router.get('/:email', userController.getUserByEmail);
 router.post('/', userController.createUser);
 

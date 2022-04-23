@@ -1,0 +1,15 @@
+.footer {
+    width: 80%;
+    height: auto;
+    padding: 5%;
+    justify-content: center;
+    background: darkslateblue;
+    color: snow;
+}
+
+#id {
+    width: 80%;
+    height: auto;
+    justify-content: center;
+    background: silver;
+}
